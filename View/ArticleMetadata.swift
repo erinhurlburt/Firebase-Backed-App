@@ -9,19 +9,13 @@ import SwiftUI
 
 struct ArticleMetadata: View {
     var article: Article
+    
 
     var body: some View {
         HStack() {
             Text(article.title)
                 .font(.headline)
             
-//            if article.isFavorite {
-//                Image(systemName: "star.fill")
-//                    .imageScale(.medium)
-//                    .foregroundColor(.yellow)
-//            }
-            
-            //FavoriteButton(isSet: article.isFavorite)
 
             Spacer()
 
@@ -42,8 +36,10 @@ struct ArticleMetadata_Previews: PreviewProvider {
             id: "12345",
             title: "Preview",
             date: Date(),
+            author: "Author",
+            link: "https://www.foodnetwork.com",
             body: "Lorem ipsum dolor sit something something amet",
-            isFavorite: true
+            mealType: "Lunch"
         ))
     }
 }

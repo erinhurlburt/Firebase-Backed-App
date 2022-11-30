@@ -13,10 +13,13 @@ struct ArticleEntry: View {
     @Binding var articles: [Article]
     @Binding var writing: Bool
     
+
+    
     @State var title = ""
     @State var articleBody = ""
+    @State var link = ""
     @State var author = ""
-    @State var favorite = false
+    @State var mealType = ""
 
     func submitArticle() {
         // We take a two-part approach here: this first part sends the article to
@@ -25,27 +28,22 @@ struct ArticleEntry: View {
             id: UUID().uuidString, // Temporary, only here because Article requires it.
             title: title,
             date: Date(),
+            author: author,
+            link: link,
             body: articleBody,
-            isFavorite: favorite
+            mealType: mealType
             
         ))
 
-        // As an optimization, instead of reloading all of the entries again, we
-        // just _add a new Article in memory_. This makes things appear faster and
-        // if the database creation worked fine, upon the next load we would then
-        // get the real stored Article.
-        //
-        // There is some risk here—in the event of an error we might mistakenly
-        // provide the wrong impression that the Article was stored when it actually
-        // wasn’t. More sophisticated code can look at the published `error` variable
-        // in the article service and provide some feedback if that error becomes
-        // non-nil.
+        
         articles.append(Article(
             id: articleId,
             title: title,
             date: Date(),
+            author: author,
+            link: link,
             body: articleBody,
-            isFavorite: favorite
+            mealType: mealType
         ))
 
         writing = false
@@ -61,9 +59,16 @@ struct ArticleEntry: View {
                 
                 Section(header: Text("Author")) {
                     TextField("", text: $author)
-                        //.padding(.top, -100)
                 }
                 
+                Section(header: Text("Link")) {
+                    TextField("", text: $link)
+                }
+                
+                Section(header: Text("Meal Type (Breakfast, Lunch, Dinner)")) {
+                    TextField("", text: $mealType)
+                }
+
                 Section(header: Text("Body")) {
                     TextEditor(text: $articleBody)
                         .frame(minHeight: 256, maxHeight: .infinity)
@@ -85,6 +90,7 @@ struct ArticleEntry: View {
                 }
             }
         }
+    
     }
 }
 

@@ -7,35 +7,36 @@
 
 import SwiftUI
 
+struct meal {
+    let label: String
+    let type: String
+}
+
 struct ArticleList: View {
     //objects of the service group
     @EnvironmentObject var auth: BlogAuth
     @EnvironmentObject var articleService: BlogArticle
+    @ObservedObject private var viewModel = BlogArticle()
+    
+    @State private var isEditing = true
+    @State private var searchText = ""
 
     @Binding var requestLogin: Bool
 
     @State var articles: [Article]
+    //@State var article: Article
     @State var error: Error?
     @State var fetching = false
     @State var writing = false
-    @State var title: String = ""
-    //@State var isFavorite: Bool
+    @State var mealType = "Lunch"
+    //@State var title: String = ""
+    //@State var author: String = ""
     
-    @State private var showFavoritesOnly = false
     
-    var filteredRecipes: [Article] {
-        articles.filter { articles in
-            (!showFavoritesOnly || articles.isFavorite)
-        }
-    }
-    
-    private func deleteItem(at indexSet: IndexSet) {
-        articles.remove(atOffsets: indexSet)
-    }
 
     var body: some View {
         NavigationView {
-            List {
+            VStack {
                 if fetching {
                     ProgressView()
                 } else if error != nil {
@@ -47,20 +48,25 @@ struct ArticleList: View {
                         Spacer()
                     }
                 } else {
-                    
-                    Toggle(isOn: $showFavoritesOnly) {
-                        Text("Favorites only")
-                    }
-                    
-                    
-                    ForEach(articles) { article in
-                        NavigationLink {
-                            ArticleDetail(article: article)
-                                .padding(.top, -150)
-                        } label: {
-                            ArticleMetadata(article: article)
+ 
+                    List {
+                        ForEach(articles) { article in
+                            NavigationLink {
+                                ArticleDetail(article: article)
+                                //.padding(.top, -150)
+ 
+                            } label: {
+                                ArticleMetadata(article: article)
+                                
+                                Button("Delete", action: {
+                                    self.viewModel.deleteData(documentID: article.id)
+                                })
+                                .buttonStyle(PlainButtonStyle())
+                                .foregroundColor(.red)
+                            }
                         }
                     }
+
                 }
             }
             .navigationTitle("Recipe Blog!")
@@ -83,6 +89,8 @@ struct ArticleList: View {
                                 // in a production app.
                             }
                         }
+                        
+                        
                     } else {
                         Button("Sign In") {
                             requestLogin = true
@@ -91,6 +99,8 @@ struct ArticleList: View {
                 }
             }
         }
+        
+        
         .sheet(isPresented: $writing) {
             ArticleEntry(articles: $articles, writing: $writing)
         }
@@ -120,19 +130,23 @@ struct ArticleList_Previews: PreviewProvider {
                 id: "12345",
                 title: "Preview",
                 date: Date(),
+                author: "Example",
+                link: "https://www.foodnetwork.com",
                 body: "Lorem ipsum dolor sit something something amet",
-                isFavorite: true
+                mealType: "Dinner"
             ),
 
             Article(
                 id: "67890",
                 title: "Some time ago",
                 date: Date(timeIntervalSinceNow: TimeInterval(-604800)),
+                author: "Author",
+                link: "https://www.foodnetwork.com",
                 body: "Duis diam ipsum, efficitur sit amet something somesit amet",
-                isFavorite: false
+                mealType: "Breakfast"
             )
         ])
-            .environmentObject(BlogAuth())
-            .environmentObject(BlogArticle())
+        .environmentObject(BlogAuth())
+        .environmentObject(BlogArticle())
     }
 }
