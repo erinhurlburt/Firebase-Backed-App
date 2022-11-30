@@ -11,6 +11,9 @@ struct Article: Hashable, Codable, Identifiable {
     var id: String
     var title: String
     var date: Date
+    var author: String
+    var link: String
     var body: String
-    var isFavorite: Bool
+    var mealType: String
 }
+
