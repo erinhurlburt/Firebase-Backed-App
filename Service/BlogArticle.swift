@@ -40,8 +40,10 @@ class BlogArticle: ObservableObject {
         ref = db.collection(COLLECTION_NAME).addDocument(data: [
             "title": article.title,
             "date": article.date, // This gets converted into a Firestore Timestamp.
+            "author": article.author,
+            "link": article.link,
             "body": article.body,
-            //"isFavorite": article.isFavorite
+            "mealType": article.mealType
         ]) { possibleError in
             if let actualError = possibleError {
                 self.error = actualError
@@ -73,7 +75,10 @@ class BlogArticle: ObservableObject {
 
                 // Firestore returns Swift Dates as its own Timestamp data type.
                 let dateAsTimestamp = $0.get("date") as? Timestamp,
-                let body = $0.get("body") as? String else {
+                let author = $0.get("author") as? String,
+                let link = $0.get("link") as? String,
+                let body = $0.get("body") as? String,
+                let mealType = $0.get("mealType") as? String else {
                 throw ArticleServiceError.mismatchedDocumentError
             }
 
@@ -81,20 +86,22 @@ class BlogArticle: ObservableObject {
                 id: $0.documentID,
                 title: title,
                 date: dateAsTimestamp.dateValue(),
+                author: author,
+                link: link,
                 body: body,
-                isFavorite: true
+                mealType: mealType
             )
         }
     }
     
+    
     func deleteData(documentID: String) {
-            print(documentID)
-            db.collection("contacts").document(documentID).delete() { err in
-                if let err = err {
-                    print("Error removing document: \(err)")
-                } else {
-                    print("Document successfully removed!")
-                }
+        print(documentID)
+        db.collection("articles").document(documentID).delete() { err in
+            if let err = err {
+                print("Error removing document: \(err)")
+            } else {
+                print("Document successfully removed!")
             }
         }
     }
